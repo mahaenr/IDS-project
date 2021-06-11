@@ -16,6 +16,39 @@ library(shinythemes)
                         style="text-align:justify;color:black;background-color:lavender;padding:15px;border-radius:10px"
                
                ),
+            tabPanel("Programming Languages",
+               titlePanel("What is Programming Languages?"),
+               p("Computer programming languages allow us to give instructions to a computer in a language the computer understands. 
+                 Just as many human-based languages exist, there are an array of computer programming languages that programmers can use 
+                 to communicate with a computer. The portion of the language that a computer can understand is called a \“binary.\” 
+                 Translating programming language into binary is known as \“compiling.\” Each language, from C Language to Python, has its own distinct features, 
+                 though many times there are commonalities between programming languages."),
+               style="text-align:justify;color:black;background-color:lavender;padding:15px;border-radius:10px",
+               tableOutput("category"),
+               br(),
+               p("So, what language you want to learn? It does not matter much for your first language but it is more efficient to learn programming language
+                  according to what you want to create! Moreover, among hundreds of programming languages out there, there are some that are popular among programmers.
+                 It is better to learn the languages that are currently in trend so you do not stuck with old technology! "),
+               br(),
+               p("Below are some statistics that can help you choose your language:"),
+               br(),
+               plotOutput("stats"),
+               br(),
+               p("The trend of top 10 programming languages from 2004 - 2021 (percentage by years):"),
+               plotOutput("ten"),
+               br(),               
+               p("Choose the available programming languages below and see its trend, popularity percentage over the years!"),
+               selectInput("trend",
+                           "Choose Language:",
+                           c("Abap" ,"Ada","C/C++","C#","Cobol", "Dart","Delphi","Go","Groovy","Haskell","Java",
+                             "JavaScript","Julia","Kotlin","Lua","Matlab","Objective-C","Perl","PHP","Python", "R","Ruby",
+                             "Rust", "Scala", "Swift", "TypeScript", "VBA", "Visual Basic")
+               ),
+               submitButton("Enter",icon("sign-in")),
+               plotOutput("growth")
+               
+               
+               ),
       tabPanel("Variables",
                titlePanel("Our first lesson!"),
                tags$h4("First things first, let's print out the basic program that all new coders are introduced to!"),
@@ -279,7 +312,8 @@ library(shinythemes)
                    textOutput("notice"),
                    actionButton("scheme", "Click this to submit and click below to view the scheme.",icon("sign-in")),
                    submitButton("Scheme",icon("sign-in")),
-                   
+                   style="text-align:justify;color:black;background-color:lavender;padding:15px;border-radius:10px",
+
                    br(),
                    p("Your Results: "),
                    plotOutput("resultPie"),
@@ -315,6 +349,79 @@ library(shinythemes)
 
   
   server <- function(input,output){
+    
+    library(tidyverse) # metapackage of all tidyverse packages
+    #Read dataset into a data frame
+    prog_lang <- read_csv("Most Popular Programming Languages from 2004 to 2021 V4.csv")
+    
+    #use colmeans func to find out means of the columns to look at which programming languages are the most popular
+    
+    (colMeans(prog_lang[,2:29]))
+    
+    sort(colMeans(prog_lang[,2:29]), decreasing = TRUE)[1:10]
+    
+    #store the subsetted list in a vector
+    sorted_list <- sort(colMeans(prog_lang[,2:ncol(prog_lang)]), decreasing = TRUE)
+    #create a tibble with your data and name the columns appropriately 
+    df <- tibble("ProgrammingLanguage" = names(sorted_list)[1:10], "Popularity" = as.numeric(sorted_list)[1:10])
+    
+    output$stats <- renderPlot({
+      
+      #print(df)
+      #plotting the data on a barplot to represent popularity of the top 10 programming languages
+      plot(
+        ggplot(data = df, aes(x = ProgrammingLanguage, y = Popularity)) +
+          geom_bar(stat = "identity", color = "black", fill = "blue") +
+          ggtitle("Average popularity of top 10 programming languages, 2004 to 2021")
+      )
+    })
+    
+    library(zoo)
+    prog_lang$Date <- as.Date(as.yearmon(prog_lang$Date))
+    
+    output$ten <- renderPlot({
+      library("reshape2")
+      #melt data into long format
+      df <- prog_lang[c(1:194),c(1,4,5,12,13,17,18,19,20,21,29)]
+      test_data_long <- melt(df, id="Date")  
+      
+      #plot the line chart based on value
+      plot(ggplot(data= test_data_long,
+                  aes(x= Date, y= value, colour = variable)) +
+             geom_line()
+      )
+    })
+    
+    output$growth <- renderPlot({
+      
+      x <- input$trend
+      if(x == "C/C++"){
+        df <- prog_lang[c(1:203),c(1,4)]
+      }
+      else{
+        x <- paste("^",x, "$", sep = "")
+        index <- grep(x, colnames(prog_lang))
+        df <- prog_lang[c(1:203),c(1,index)]
+      }
+      
+      library("reshape2")
+      #melt data into long format
+      test_data_long <- melt(df, id="Date")  
+      
+      #plot the line chart based on value
+      plot(ggplot(data= test_data_long,
+                  aes(x= Date, y= value , colour = variable)) +
+             geom_line()
+      )
+      
+    })
+    
+    output$category <- renderTable({
+      Field <- c("Front-end","Back-end","Mobile Developmet","Game Development","Data Science")
+      Languages <- c("Javascript, TypeScript","JavaScript, Scala, PHP, Python, Go, Ruby","swift, Java, Obj-C, JavaScript, Kotlin",
+                "PHP, C++, Java","Python, R, Julia, Scala")
+      uses <- data.frame(Field,Languages)
+    })
     
     output$table <- renderTable(tab)
     output$table1 <- renderTable(tab1)
