@@ -10,4 +10,4 @@ library(slidify)
 author("Code With Us Slidify")
 
 slidify('index.Rmd')
-browseURL("idex.html")
+browseURL("index.html")
