@@ -4,7 +4,7 @@ library(devtools)
 install_github('ramnathv/slidify')
 install_github('ramnathv/slidifyLibraries')
 
-setwd("C:/Users/Acer/Desktop/Introduction to Data Science WIE2003/Assignment/Code with Us")
+setwd("C:/Users/Acer/Desktop/Code With Us")
 
 library(slidify)
 author("Code With Us Slidify")
