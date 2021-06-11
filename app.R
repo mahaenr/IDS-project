@@ -318,6 +318,8 @@ library(shinythemes)
                    p("Your Results: "),
                    plotOutput("resultPie"),
                    br(),
+                   textOutput("mark"),
+                   br(),
                    tableOutput("res"),
                    br(),
                    p("Answer Scheme:"),
@@ -551,7 +553,20 @@ library(shinythemes)
         table <- data.frame(Question,Answer)
       })
     })
-
+    
+    observeEvent(input$scheme, {
+      output$mark <- renderText({
+        scheme <- c("d","b","d","d","b","a","a","a","c","a")
+        answer <- c(input$q1,input$q2,input$q3,input$q4,input$q5,
+                    input$q6,input$q7,input$q8,input$q9,input$q10)
+        boolAns <- answer == scheme
+        trueAns <- length(boolAns[boolAns== TRUE])
+        falseAns <- length(boolAns[boolAns== FALSE])
+        marks <- (trueAns/10.0) *100
+        paste("Your marks:", marks, "%")
+      })
+    })
+    
     observeEvent(input$scheme, {
       output$ansq1 <- renderText({
         input$scheme
