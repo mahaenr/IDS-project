@@ -5,8 +5,8 @@ ui <- fluidPage(theme=shinytheme("superhero"),
                 navbarPage(
                   "CodeWithUs",
                   tabPanel("Intro",
-                           titlePanel("Welcome to Code With Us!"),
-                           img(src = "image1.png", height = 400, width = 800),
+                           titlePanel(h1("Welcome to Code With Us!", align = "center")),
+                           img(src = "image1.png", height = 400, width = 800, style="display: block; margin-left: auto; margin-right: auto;"),
                            br(),
                            p("Code With Us is an application that teaches basic Java programming to those who are new to the world of coding. 
                        Through this application, it is intended to develop a learning environment for anyone who is starting in the study of Java 
